@@ -10,6 +10,7 @@ class Parser:
             self.__suppress_context__ = True
 
     def raise_parse_error(self, message):
+        self.close()
         raise self.ParserError(self, message)
 
 
@@ -62,7 +63,7 @@ class Parser:
         #Read commands
         while True:
             line = self.readline().strip()
-            #End of file; anything after 
+            #End of file; anything after is ignored
             if not line: break
 
             toks = list(map(lambda tok: tok.strip(), line.split(',')))
@@ -73,6 +74,8 @@ class Parser:
         
         if len(puzzle) != len(commands):
             self.raise_parse_error("Command array must be the same size as the puzzle")
+
+        self.close()
 
         return (puzzle, commands)
 
