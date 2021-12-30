@@ -29,17 +29,19 @@ class Interpreter:
         self.path = path
         self.w = 0
         self.h = 0
+        self.r = 0
+        self.c = 0
 
     #Find the current position (0 cell)
     def find_start(self):
-        r, c = -1, -1
+        self.r, self.c = -1, -1
         for i in range(self.h):
             for j in range(self.w):
                 if not self.puzzle[i][j]:
-                    r, c = i, j
+                    self.r, self.c = i, j
                     break
-            if r != -1: break
-        return r, c
+            if self.r != -1: break
+        return self.r, self.c
 
     #Check if puzzle is solved
     def check_puzzle(self):
@@ -55,11 +57,11 @@ class Interpreter:
             r, c = self.find_start()
 
         # Isolate Move and Function out of each command
-        command = self.commands[r][c]
+        command = self.commands[self.r][self.c]
         try:
-            m = command[0]
+            m = OPCODE(command[0])
             try:
-                f = command[1]
+                f = OPCODE(command[1])
             except IndexError:
                 f = OPCODE.NOOP
         except IndexError:
@@ -67,7 +69,7 @@ class Interpreter:
             f = OPCODE.NOOP
         #Each command must begin with a move
         if m not in move_commands:
-            raise CommandError(r, c, command)
+            raise CommandError(self.r, self.c, command)
 
         
         if m == OPCODE.MOVE_UP:
@@ -93,7 +95,7 @@ class Interpreter:
         self.w = len(self.puzzle[0])
         self.h = len(self.puzzle)
         #Reduces overhead compared to finding 0 cell everytime
-        r, c = self.find_start()
+        self.find_start()
         self.memory = [i for i in range(self.w*self.h)]
 
         try:
