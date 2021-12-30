@@ -32,8 +32,11 @@ class Interpreter:
         self.r = 0
         self.c = 0
 
-    #Find the current position (0 cell)
-    def find_start(self):
+    #Determine puzzle size and starting position (cell 0)
+    def init_position(self):
+        self.w = len(self.puzzle[0])
+        self.h = len(self.puzzle)
+
         self.r, self.c = -1, -1
         for i in range(self.h):
             for j in range(self.w):
@@ -92,10 +95,8 @@ class Interpreter:
             return
 
         #Initialize memory model and other stuff
-        self.w = len(self.puzzle[0])
-        self.h = len(self.puzzle)
         #Reduces overhead compared to finding 0 cell everytime
-        self.find_start()
+        self.init_position()
         self.memory = [i for i in range(self.w*self.h)]
 
         try:
