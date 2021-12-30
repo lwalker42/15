@@ -64,6 +64,9 @@ class Parser:
 
             toks = list(map(lambda tok: tok.strip(), line.split(',')))
 
+            if any(map(lambda tok : len(tok) > 2, toks)):
+                self.raise_parse_error("Commands must be at most two characters each")
+
             if len(puzzle[0]) != len(toks):
                 self.raise_parse_error("Command array must be the same size as the puzzle")
             commands.append(toks)
