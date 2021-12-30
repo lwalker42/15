@@ -15,8 +15,9 @@ class OPCODE(enum.Enum):
     MULTIPLY = '*'
     DIVIDE = '/'
     ZERO = '0'
-    READ = '='
-    WRITE = '#'
+    READ = '@'
+    WRITE = '='
+    SWAP = '~'
 
     NOOP = '_'
 
@@ -55,9 +56,43 @@ class Interpreter:
         return True
 
 
-    def step(self, r = -1, c = -1):
-        if r == -1 or c == -1:
-            r, c = self.find_start()
+    def move_up(self):
+        if self.r == 0: return None
+        self.puzzle[self.r][self.c], self.puzzle[self.r - 1][self.c] = \
+        self.puzzle[self.r - 1][self.c], self.puzzle[self.r][self.c]
+        self.r -= 1
+        return self.puzzle[self.r][self.c]
+
+    def move_down(self):
+        if self.r == self.h - 1: return None
+        self.puzzle[self.r][self.c], self.puzzle[self.r + 1][self.c] = \
+        self.puzzle[self.r + 1][self.c], self.puzzle[self.r][self.c]
+        self.r += 1
+        return self.puzzle[self.r][self.c]
+
+    def move_left(self):
+        if self.c == 0: return None
+        self.puzzle[self.r][self.c], self.puzzle[self.r][self.c - 1] = \
+        self.puzzle[self.r][self.c - 1], self.puzzle[self.r][self.c]
+        self.c -= 1
+        return self.puzzle[self.r][self.c]
+
+    def move_right(self):
+        if self.c == self.w - 1: return None
+        self.puzzle[self.r][self.c], self.puzzle[self.r][self.c + 1] = \
+        self.puzzle[self.r][self.c + 1], self.puzzle[self.r][self.c]
+        self.c += 1
+        return self.puzzle[self.r][self.c]
+
+    def move(self, opcode):
+        if opcode not in move_commands: return None
+        if opcode == OPCODE.MOVE_UP: return self.move_up()
+        elif opcode == OPCODE.MOVE_DOWN: return self.move_down()
+        elif opcode == OPCODE.MOVE_LEFT: return self.move_left()
+        elif opcode == OPCODE.MOVE_RIGHT: return self.move_right()
+
+
+    def step(self):
 
         # Isolate Move and Function out of each command
         command = self.commands[self.r][self.c]
@@ -71,12 +106,38 @@ class Interpreter:
             m = OPCODE.NOOP
             f = OPCODE.NOOP
         #Each command must begin with a move
+        #(Also helps avoid infinite loop)
         if m not in move_commands:
             raise CommandError(self.r, self.c, command)
 
+
+        '''Main command switch/case'''
         
-        if m == OPCODE.MOVE_UP:
-            pass
+        #Handle double move command 
+        if f in move_commands:
+            #Special case: doubled move opcode (jump by accumulator value)
+            #i.e. '^^', 'vv', '<<', '>>'
+            if f == m:
+                i = 0
+                while i < self.memory[0]:
+                    self.move(m)
+                    i += 1
+
+            #If/else move
+            if self.memory[0]:
+                self.move(m)
+            else:
+                self.move(f)
+
+        #f is a non-move opcode (i.e. function)
+        else:
+            #Cell that the move swapped with
+            cell = self.move(m)
+
+            if f == OPCODE.INPUT:
+                print("input")
+            elif f == OPCODE.OUTPUT:
+                print("output")
 
         
 
@@ -100,7 +161,14 @@ class Interpreter:
         self.memory = [i for i in range(self.w*self.h)]
 
         try:
-            self.step()
+            while True:
+                self.step()
+
+                if (self.r, self.c) == (self.h - 1, self.w -1):
+                    if self.check_puzzle():
+                        print("Program terminated")
+                        return
+
         except CommandError as e:
             print(e.message)
             return
