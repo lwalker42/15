@@ -4,14 +4,10 @@ class Parser:
         self.path = path
         self.line_num = 0
 
-    class ParserError(Exception):
-        def __init__(self, parser, message):
-            super().__init__("line " + str(parser.line_num) + ": " + message)
-            self.__suppress_context__ = True
 
     def raise_parse_error(self, message):
         self.close()
-        raise self.ParserError(self, message)
+        raise ParseError(self, message)
 
 
     def open(self, *args):
@@ -79,5 +75,9 @@ class Parser:
 
         return (puzzle, commands)
 
-
+class ParseError(Exception):
+        def __init__(self, parser : Parser, message):
+            self.message = "Syntax Error on line " + str(parser.line_num) + ": " + message
+            super().__init__(self.message)
+            self.__suppress_context__ = True
 
