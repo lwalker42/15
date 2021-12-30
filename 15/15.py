@@ -9,6 +9,7 @@ class OPCODE(enum.Enum):
 
     INPUT = '?'
     OUTPUT = '!'
+    OUTPUT_ASCII = 'X'
     
     ADD = '+'
     SUBTRACT = '-'
@@ -28,6 +29,7 @@ move_commands = [OPCODE.MOVE_UP, OPCODE.MOVE_DOWN,
 class Interpreter:
     def __init__(self, path):
         self.path = path
+        self.buffer = ''
         self.w = 0
         self.h = 0
         self.r = 0
@@ -35,6 +37,8 @@ class Interpreter:
 
     #Determine puzzle size and starting position (cell 0)
     def init_position(self):
+        self.buffer = ''
+
         self.w = len(self.puzzle[0])
         self.h = len(self.puzzle)
 
@@ -135,9 +139,22 @@ class Interpreter:
             cell = self.move(m)
 
             if f == OPCODE.INPUT:
-                print("input")
+                while not self.buffer:
+                    self.buffer = input()
+                
+                #If integer, treat it as such
+                try:
+                    self.memory[0] = int(self.buffer)
+                    self.buffer = ''
+                except:
+                    self.memory[0] = ord(self.buffer[0])
+                    self.buffer = self.buffer[1:]
+
             elif f == OPCODE.OUTPUT:
-                print("output")
+                print(self.memory[0])
+                
+            elif f == OPCODE.OUTPUT_ASCII:
+                print(chr(self.memory[0]))
 
         
 
