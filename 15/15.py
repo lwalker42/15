@@ -1,7 +1,7 @@
 import parse
 import enum
 
-class OPCODE(enum):
+class OPCODE(enum.Enum):
     MOVE_UP = '^'
     MOVE_DOWN = 'v'
     MOVE_LEFT = '<'
@@ -20,8 +20,9 @@ class OPCODE(enum):
 
     NOOP = '_'
 
+move_commands = [OPCODE.MOVE_UP, OPCODE.MOVE_DOWN, 
+                 OPCODE.MOVE_LEFT, OPCODE.MOVE_RIGHT]
 
-    
 
 class Interpreter:
     def __init__(self, path):
@@ -32,8 +33,8 @@ class Interpreter:
     #Find the current position (0 cell)
     def find_start(self):
         r, c = -1, -1
-        for i in range(len(self.h)):
-            for j in range(len(self.w)):
+        for i in range(self.h):
+            for j in range(self.w):
                 if not self.puzzle[i][j]:
                     r, c = i, j
                     break
@@ -49,19 +50,44 @@ class Interpreter:
         return True
 
 
+    def step(self, r = -1, c = -1):
+        if r == -1 or c == -1:
+            r, c = self.find_start()
+
+        # Isolate Move and Function out of each command
+        command = self.commands[r][c]
+        try:
+            m = command[0]
+            try:
+                f = command[1]
+            except IndexError:
+                f = OPCODE.NOOP
+        except IndexError:
+            m = OPCODE.NOOP
+            f = OPCODE.NOOP
+        #Each command must begin with a move
+        if m not in move_commands:
+            raise CommandError(r, c, command)
+
+        
+        if m == OPCODE.MOVE_UP:
+            pass
+
+        
+
+
     def run(self):
         #Handle parsing
         try:
             parser = parse.Parser(self.path)
             self.puzzle, self.commands = parser.parse()
-            print(self.puzzle, self.commands)
+            #print(self.puzzle, self.commands)
         except parse.ParseError as e:
             print(e.message)
-            quit()
+            return
         except FileNotFoundError:
             print("No file found: '" + self.path + "'")
-            quit()
-
+            return
 
         #Initialize memory model and other stuff
         self.w = len(self.puzzle[0])
@@ -70,11 +96,19 @@ class Interpreter:
         r, c = self.find_start()
         self.memory = [i for i in range(self.w*self.h)]
 
+        try:
+            self.step()
+        except CommandError as e:
+            print(e.message)
+            return
 
 
 
-
-
+class CommandError(Exception):
+    def __init__(self, r, c, command):
+        self.message = "Command Error at (" + str(r) +", " + str(c) + "): '" + command + "'"
+        super().__init__(self.message)
+        self.__suppress_context__ = True
         
         
 
