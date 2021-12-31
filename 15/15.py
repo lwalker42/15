@@ -156,6 +156,30 @@ class Interpreter:
             elif f == OPCODE.OUTPUT_ASCII:
                 print(chr(self.memory[0]))
 
+            elif f == OPCODE.ZERO:
+                self.memory[0] = 0
+
+            #These opcodes require the accumulator cell to have moved
+            elif cell is not None:
+                if f == OPCODE.ADD:
+                    self.memory[0] += self.memory[cell]
+                if f == OPCODE.SUBTRACT:
+                    self.memory[0] -= self.memory[cell]
+                if f == OPCODE.MULTIPLY:
+                    self.memory[0] *= self.memory[cell]
+                if f == OPCODE.DIVIDE:
+                    self.memory[0] /= self.memory[cell]
+                if f == OPCODE.READ:
+                    self.memory[0] = self.memory[cell]
+                if f == OPCODE.WRITE:
+                    self.memory[cell] = self.memory[0]
+                if f == OPCODE.SWAP:
+                    self.memory[0], self.memory[cell] = \
+                    self.memory[cell], self.memory[0]
+            
+            #NOOP
+            else:
+                pass
         
 
 
