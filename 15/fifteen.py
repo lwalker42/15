@@ -65,28 +65,28 @@ class Interpreter:
         self.puzzle[self.r][self.c], self.puzzle[self.r - 1][self.c] = \
         self.puzzle[self.r - 1][self.c], self.puzzle[self.r][self.c]
         self.r -= 1
-        return self.puzzle[self.r][self.c]
+        return self.puzzle[self.r+1][self.c]
 
     def move_down(self):
         if self.r == self.h - 1: return None
         self.puzzle[self.r][self.c], self.puzzle[self.r + 1][self.c] = \
         self.puzzle[self.r + 1][self.c], self.puzzle[self.r][self.c]
         self.r += 1
-        return self.puzzle[self.r][self.c]
+        return self.puzzle[self.r-1][self.c]
 
     def move_left(self):
         if self.c == 0: return None
         self.puzzle[self.r][self.c], self.puzzle[self.r][self.c - 1] = \
         self.puzzle[self.r][self.c - 1], self.puzzle[self.r][self.c]
         self.c -= 1
-        return self.puzzle[self.r][self.c]
+        return self.puzzle[self.r][self.c+1]
 
     def move_right(self):
         if self.c == self.w - 1: return None
         self.puzzle[self.r][self.c], self.puzzle[self.r][self.c + 1] = \
         self.puzzle[self.r][self.c + 1], self.puzzle[self.r][self.c]
         self.c += 1
-        return self.puzzle[self.r][self.c]
+        return self.puzzle[self.r][self.c-1]
 
     def move(self, opcode):
         if opcode not in move_commands: return None
@@ -154,7 +154,7 @@ class Interpreter:
                 print(self.memory[0])
                 
             elif f == OPCODE.OUTPUT_ASCII:
-                print(chr(self.memory[0]))
+                print(chr(self.memory[0]), end='')
 
             elif f == OPCODE.ZERO:
                 self.memory[0] = 0
@@ -168,7 +168,7 @@ class Interpreter:
                 if f == OPCODE.MULTIPLY:
                     self.memory[0] *= self.memory[cell]
                 if f == OPCODE.DIVIDE:
-                    self.memory[0] /= self.memory[cell]
+                    self.memory[0] //= self.memory[cell]
                 if f == OPCODE.READ:
                     self.memory[0] = self.memory[cell]
                 if f == OPCODE.WRITE:
@@ -207,7 +207,6 @@ class Interpreter:
 
                 if (self.r, self.c) == (self.h - 1, self.w -1):
                     if self.check_puzzle():
-                        print("Program terminated")
                         return
 
         except CommandError as e:
