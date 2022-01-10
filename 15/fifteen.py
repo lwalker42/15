@@ -119,13 +119,11 @@ class Interpreter:
         
         #Handle double move command 
         if f in move_commands:
-            #Special case: doubled move opcode (jump by accumulator value)
+            #Special case: doubled move opcode (jump to end)
             #i.e. '^^', 'vv', '<<', '>>'
             if f == m:
-                i = 0
-                while i < self.memory[0]:
-                    self.move(m)
-                    i += 1
+                while self.move(m):
+                    pass
 
             #If/else move
             if self.memory[0]:

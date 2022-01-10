@@ -59,8 +59,11 @@ class Parser:
         #Read commands
         while True:
             line = self.readline().strip()
-            #End of file; anything after is ignored
-            if not line: break
+            if not line:
+                #if the command array is defined, this must be the line break after it
+                if commands: break
+                #otherwise, it's padding in between
+                else: continue
 
             toks = list(map(lambda tok: tok.strip(), line.split(',')))
 
