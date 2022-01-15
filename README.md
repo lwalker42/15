@@ -6,16 +6,14 @@
 <img width="60%" src="assets\15-puzzle.jpg">
 </p>
 
-<br/><br/>
+<br/>
 
 ## Usage
----
 Run `python 15 filename.15` or `import 15/fifteen` to use the interpreter on it's own and step through execution.
 
 <br/>
 
 ## Overview
----
 The main goal of this language is to have the execution mimic the movement of 15 puzzle play.  To this end, each step of the program is analogous to moving a piece in the puzzle, and execution halts *if and only if* the puzzle is solved.
 - The program has two parts: an instruction array, and the puzzle piece array
 - Per the analogy, the commands are written on the backboard and then the pieces (`1` to `n`) are placed on top leaving a single empty space
@@ -27,7 +25,6 @@ NB: The empty space acts both as the instruction pointer and as the memory point
 <br/>
 
 ## The Language
----
 
 ### Syntax
 Every program consists of two 2D arrays of the same size: first the puzzle, then the commands.  Each line of numbers/commands is comma separated (with no terminating comma).  The puzzle and command arrays must be contiguous blocks separated by at least one newline; otherwise spacing is ignored.  Everything after the command array is ignored. 
